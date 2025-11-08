@@ -42,3 +42,11 @@ def reserve_stock(book_id: int, req: schemas.ReserveRequest, db: Session = Depen
     book.stock -= req.qty
     db.commit()
     return {"reserved": True}
+@router.delete("/{book_id}", status_code=204)
+def delete_book(book_id: int, db: Session = Depends(get_db)):
+    book = db.query(models.Book).get(book_id)
+    if not book:
+        raise HTTPException(404, "Book not found")
+    db.delete(book)
+    db.commit()
+    return

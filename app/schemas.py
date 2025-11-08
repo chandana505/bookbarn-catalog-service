@@ -23,3 +23,6 @@ class BookOut(BaseModel):
 
 class ReserveRequest(BaseModel):
     qty: int = Field(ge=1)
+
+class BookDelete(BaseModel):
+    id: int
