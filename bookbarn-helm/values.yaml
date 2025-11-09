@@ -1,0 +1,31 @@
+namespace: bookbarn
+
+ingress:
+  enabled: true
+  host: bookbarn.local
+
+postgres:
+  image: postgres:16
+  db: catalogdb
+  user: catalog
+  password: catalogpw
+  storage: 1Gi
+
+mongo:
+  image: mongo:7
+  user: orders
+  password: orderspw
+  storage: 1Gi
+
+catalog:
+  image: bookbarn/catalog-service:1.0
+  replicas: 1
+  port: 8000
+  resources: {}
+  # If you renamed fields in your code, no changes needed here.
+
+orders:
+  image: bookbarn/orders-service:1.0
+  replicas: 1
+  port: 8001
+  resources: {}

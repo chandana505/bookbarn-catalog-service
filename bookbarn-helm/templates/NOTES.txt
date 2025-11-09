@@ -1,0 +1,15 @@
+Thanks for installing BookBarn!
+
+Namespace: {{ .Values.namespace }}
+
+Services:
+  Catalog:   http://{{ .Values.ingress.host }}/catalog (via Ingress)
+  Orders:    http://{{ .Values.ingress.host }}/orders  (via Ingress)
+
+Local testing (after adding hosts entry):
+  curl http://{{ .Values.ingress.host }}/catalog/health
+  curl http://{{ .Values.ingress.host }}/orders/health
+
+Or port-forward:
+  kubectl -n {{ .Values.namespace }} port-forward svc/{{ include "bookbarn.fullname" . }}-catalog 8000:8000
+  kubectl -n {{ .Values.namespace }} port-forward svc/{{ include "bookbarn.fullname" . }}-orders 8001:8001
