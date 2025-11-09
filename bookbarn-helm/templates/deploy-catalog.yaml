@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "bookbarn.fullname" . }}-catalog
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.catalog.replicas }}
+  selector:
+    matchLabels:
+      app: {{ include "bookbarn.fullname" . }}-catalog
+  template:
+    metadata:
+      labels:
+        app: {{ include "bookbarn.fullname" . }}-catalog
+    spec:
+      containers:
+        - name: app
+          image: {{ .Values.catalog.image }}
+          ports:
+            - containerPort: {{ .Values.catalog.port }}
+          env:
+            - name: DB_HOST
+              value: {{ include "bookbarn.fullname" . }}-postgres
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "bookbarn.fullname" . }}-catalog-db
+                  key: DB_USER
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "bookbarn.fullname" . }}-catalog-db
+                  key: DB_PASSWORD
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "bookbarn.fullname" . }}-catalog-db
+                  key: DB_NAME
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.catalog.port }}
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.catalog.port }}
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          resources: {{- toYaml .Values.catalog.resources | nindent 12 }}

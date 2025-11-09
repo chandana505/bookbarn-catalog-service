@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "bookbarn.fullname" . }}-orders
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.orders.replicas }}
+  selector:
+    matchLabels:
+      app: {{ include "bookbarn.fullname" . }}-orders
+  template:
+    metadata:
+      labels:
+        app: {{ include "bookbarn.fullname" . }}-orders
+    spec:
+      containers:
+        - name: app
+          image: {{ .Values.orders.image }}
+          ports:
+            - containerPort: {{ .Values.orders.port }}
+          env:
+            - name: MONGO_URI
+              value: mongodb://{{ .Values.mongo.user }}:{{ .Values.mongo.password }}@{{ include "bookbarn.fullname" . }}-mongo:27017/ordersdb?authSource=admin
+            - name: CATALOG_BASE_URL
+              value: http://{{ include "bookbarn.fullname" . }}-catalog.{{ .Values.namespace }}.svc.cluster.local:8000
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.orders.port }}
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.orders.port }}
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          resources: {{- toYaml .Values.orders.resources | nindent 12 }}

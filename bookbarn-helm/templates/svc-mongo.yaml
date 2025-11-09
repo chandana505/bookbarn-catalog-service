@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "bookbarn.fullname" . }}-mongo
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    app: {{ include "bookbarn.fullname" . }}-mongo
+  ports:
+    - name: tcp
+      port: 27017
+      targetPort: 27017

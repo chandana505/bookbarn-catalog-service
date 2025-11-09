@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "bookbarn.fullname" . }}-orders
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    app: {{ include "bookbarn.fullname" . }}-orders
+  ports:
+    - name: http
+      port: 8001
+      targetPort: {{ .Values.orders.port }}
+  type: ClusterIP
